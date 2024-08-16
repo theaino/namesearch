@@ -1,7 +1,8 @@
 import sources
 
 
-query = input("Search: ").lower().strip()
+query = input("Search: ")
+search_name = query.strip().lower()
 
 data = {}
 namemap = {}
@@ -23,9 +24,15 @@ for source in sources.SOURCES:
     print(f"Fetched {source.name}")
 
 
-for year in data.keys():
-    boys_key = (year, query, "M")
-    girls_key = (year, query, "F")
+import matplotlib.pyplot as plt
+
+x = data.keys()
+y_boys = []
+y_girls = []
+
+for year in x:
+    boys_key = (year, search_name, "M")
+    girls_key = (year, search_name, "F")
 
     boys_count = 0
     boys_name = namemap.get(boys_key)
@@ -36,6 +43,16 @@ for year in data.keys():
     if girls_name:
         girls_count = girls_name.count
 
-    print(year)
-    print(f"\tM: {boys_count}")
-    print(f"\tF: {girls_count}")
+    y_boys.append(boys_count)
+    y_girls.append(girls_count)
+
+plt.title(query)
+line_boys, = plt.plot(x, y_boys, color="blue")
+line_boys.set_label("M")
+line_girls, = plt.plot(x, y_girls, color="red")
+line_girls.set_label("F")
+plt.legend()
+plt.xlabel("Year")
+plt.ylabel("Birth count")
+#plt.axvline(1977)
+plt.show()

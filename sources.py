@@ -8,6 +8,7 @@ import csv
 
 
 TMP = "tmp"
+STATIC = "static"
 
 
 def get_cached(url, save):
@@ -22,6 +23,12 @@ def get_cached(url, save):
     with open(filepath, "wb") as f:
         f.write(response.content)
     return response.content
+
+
+def get_static(save):
+    filepath = path.join(STATIC, save)
+    with open(filepath, "rb") as f:
+        return f.read()
 
 
 def fetch_usa():
@@ -54,6 +61,7 @@ def fetch_usa():
                         )
 
     return result
+
 
 def fetch_canada():
     urls = {
@@ -90,7 +98,32 @@ def fetch_canada():
     return result
 
 
+def fetch_norway():
+    saves = {
+            "M": "norway/boys.csv",
+            "M": "norway/girls.csv",
+            }
+
+    result = {}
+    for gender in saves.keys():
+        save = saves[gender]
+        data = get_static(save).decode("ISO-8859-1")
+        reader = csv.reader(StringIO(data), delimiter="\t")
+        y = -1
+        for row in reader:
+            y += 1
+            if y == 0:
+                continue
+            name = row[0].lower()
+            year = int(row[1])
+            count = 0 if "." in row[2] else int(row[2])
+            if year not in result:
+                result[year] = []
+            result[year].append(Name(name, gender, count))
+    return result
+
 SOURCES = [
+        #Source("norway", fetch_norway),
         Source("usa", fetch_usa),
         Source("canada", fetch_canada)
         ]
